@@ -1,0 +1,71 @@
+# This Cloud Build configuration file defines the CI/CD pipeline
+# that will be executed when code is pushed to GitHub.
+
+steps:
+# Step 1: Build the Docker Image
+# The Dockerfile is in the current directory ('.').
+# The image will be tagged with the short Git SHA from the commit.
+# We're using Artifact Registry. Replace 'your-artifact-repo-name' with your actual repo name.
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'build-docker-image'
+  args:
+    - 'build'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/your-artifact-repo-name/gke-nginx-demo:${COMMIT_SHA}'
+    - '.'
+
+# Step 2: Push the Docker Image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'push-docker-image'
+  args:
+    - 'push'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/your-artifact-repo-name/gke-nginx-demo:${COMMIT_SHA}'
+
+# Step 3: Get GKE Credentials
+# This step automatically authenticates Cloud Build worker to your GKE cluster.
+# Since the Cloud Build Private Pool worker is within your VPC, it can access
+# your private GKE control plane directly.
+# Replace 'demo' with your GKE cluster name and 'us-central1-a' with its zone.
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'get-gke-credentials'
+  args:
+    - 'container'
+    - 'clusters'
+    - 'get-credentials'
+    - 'demo'
+    - '--zone'
+    - 'us-central1-a'
+    - '--project'
+    - '${PROJECT_ID}'
+
+# Step 4: Apply Kustomize Manifests
+# This step first updates the image tag in your `overlays/dev/kustomization.yaml`
+# and then applies the Kustomize manifests.
+- name: 'gcr.io/cloud-builders/kubectl'
+  id: 'apply-kustomize-manifests'
+  entrypoint: 'bash' # Use bash to run multiple commands
+  args:
+    - '-c' # Execute the following as a string command
+    - |
+      # Navigate to the Kustomize overlay directory
+      cd overlays/dev
+      # Update the image tag in kustomization.yaml
+      # Assumes your kustomization.yaml has an image entry like:
+      # - name: gke-nginx-demo
+      #   newTag: some-old-tag
+      kustomize edit set image gke-nginx-demo=us-central1-docker.pkg.dev/${PROJECT_ID}/your-artifact-repo-name/gke-nginx-demo:${COMMIT_SHA}
+      # Apply the Kustomize manifests
+      kubectl apply -k .
+
+# Define the worker pool to use for this build.
+# This ensures your build runs on the Private Pool you configured.
+# IMPORTANT: Replace 'gke-deploy-private-pool' with the actual name
+# you will give to your Cloud Build Private Pool in Terraform.
+options:
+  pool:
+    name: 'projects/${PROJECT_ID}/locations/${_REGION}/workerPools/gke-deploy-private-pool'
+
+# You can define custom substitution variables if needed.
+# For example, to make the Artifact Registry name configurable.
+# substitutions:
+#   _AR_REPO_NAME: my-artifact-repo

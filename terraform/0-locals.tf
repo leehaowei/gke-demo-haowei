@@ -5,6 +5,8 @@ locals {
     "compute.googleapis.com",
     "container.googleapis.com",
     "logging.googleapis.com",
-    "secretmanager.googleapis.com"
+    "secretmanager.googleapis.com",
+    "servicenetworking.googleapis.com",
+    "cloudbuild.googleapis.com"
   ]
 }
