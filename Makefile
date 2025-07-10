@@ -13,7 +13,7 @@ all: build run
 
 ## Build the Docker image
 build:
-	docker build -f $(DOCKERFILE_PATH) -t $(FULL_IMAGE_NAME) .
+	docker buildx build --platform linux/amd64 -f $(DOCKERFILE_PATH) -t $(FULL_IMAGE_NAME) .
 
 ## Run the container (depends on build)
 run: build
