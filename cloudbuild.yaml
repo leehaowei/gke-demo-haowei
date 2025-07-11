@@ -2,7 +2,7 @@
 
 steps:
 # Step 1: Build Docker image
-- name: 'gcr.io/cloud-builders/docker:20.10.7'
+- name: 'gcr.io/cloud-builders/docker:latest'
   id: 'build-docker-image'
   args:
     - 'build'
@@ -11,7 +11,7 @@ steps:
     - '.'
 
 # Step 2: Push Docker image to Artifact Registry
-- name: 'gcr.io/cloud-builders/docker:20.10.7'
+- name: 'gcr.io/cloud-builders/docker:latest'
   id: 'push-docker-image'
   args:
     - 'push'
