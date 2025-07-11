@@ -10,3 +10,6 @@ images:
   - name: gke-nginx-demo
     newName: us-central1-docker.pkg.dev/gke-demo-haowei/gke-nginx-demo/gke-nginx-demo
     newTag: ${COMMIT_SHA}
+
+patchesStrategicMerge:
+  - ingress-patch.yaml
