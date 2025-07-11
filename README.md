@@ -26,3 +26,7 @@
 `curl http://35.222.212.217/sre.txt`
 - destroy the resource
 `kubectl delete -k overlays/dev/`
+
+### Inspect the current version
+use the command below to check the current image version/tag
+`kubectl get deployment nginx -n demo -o yaml | grep image:`
