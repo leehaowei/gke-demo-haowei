@@ -1,4 +1,4 @@
-name: CI/CD Build and Deploy to GKE
+name: Trigger Cloud Build on Push
 
 on:
   push:
@@ -6,34 +6,20 @@ on:
       - main
 
 jobs:
-  deploy:
+  trigger-cloud-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Authenticate with Docker Hub
-        run: |
-          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t haoweilee/gke-nginx-demo:v1 .
-          docker push haoweilee/gke-nginx-demo:v1
-
-      - name: Authenticate to Google Cloud
+      - name: Trigger Cloud Build
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Set up Google Cloud CLI
+      - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v1
 
-      - name: Get GKE Credentials
+      - name: Call Cloud Build API
         run: |
-          gcloud container clusters get-credentials demo --zone us-central1-a
-
-      - name: Apply Kustomize manifests
-        run: |
-          kubectl apply -k overlays/dev
+          gcloud builds triggers run gke-nginx-demo-trigger \
+            --project=gke-demo-haowei \
+            --branch=main

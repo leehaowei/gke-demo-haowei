@@ -7,5 +7,5 @@ resources:
 
 images:
   - name: gke-nginx-demo
-    newName: us-central1-docker.pkg.dev/your-project-id/your-artifact-repo-name/gke-nginx-demo
-    newTag: placeholder-tag
+    newName: us-central1-docker.pkg.dev/gke-demo-haowei/gke-nginx-demo/gke-nginx-demo
+    newTag: ${COMMIT_SHA} # or hardcoded for local testing
