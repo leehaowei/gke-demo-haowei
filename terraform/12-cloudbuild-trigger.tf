@@ -61,13 +61,14 @@ resource "google_cloudbuild_trigger" "github_push_trigger" {
     repository = google_cloudbuildv2_repository.repo.id
 
     push {
-      branch = "^main$"
+      branch = "^dev$"
     }
   }
 
   filename = "cloudbuild.yaml"
 
   substitutions = {
+    _ENV         = "dev"
     _AR_REPO_NAME = "gke-nginx-demo"
     _IMAGE_NAME   = "gke-nginx-demo"
     _CLUSTER_NAME = "demo"

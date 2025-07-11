@@ -42,7 +42,7 @@ steps:
       tar -xzf kustomize
       chmod +x kustomize
       mv kustomize /usr/local/bin/kustomize
-      cd overlays/dev
+      cd overlays/${_ENV}
       kustomize edit set image ${_IMAGE_NAME}=us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}
       kubectl apply -k .
       echo "Deployment complete."
