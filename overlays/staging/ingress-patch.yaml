@@ -1,3 +1,4 @@
+# overlays/staging/ingress-patch.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -5,3 +6,12 @@ metadata:
 spec:
   rules:
     - host: staging.nginx.9young.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx
+                port:
+                  number: 80

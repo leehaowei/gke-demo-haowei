@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: gce
   rules:
-    - host: staging.nginx.9young.xyz
+    - host: nginx.9young.xyz
       http:
         paths:
           - path: /
