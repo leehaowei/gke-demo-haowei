@@ -49,7 +49,6 @@ options:
     name: 'projects/${PROJECT_ID}/locations/${_REGION}/workerPools/gke-deploy-private-pool'
   logging: CLOUD_LOGGING_ONLY
   machineType: 'E2_MEDIUM'
-  diskSizeGb: 100
 
 # Substitution variables
 substitutions:
