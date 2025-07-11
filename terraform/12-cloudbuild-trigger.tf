@@ -34,6 +34,21 @@ resource "google_project_iam_member" "artifact_registry_writer" {
   member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
 }
 
+# Grant permission to view GKE clusters (needed for `get-credentials`)
+resource "google_project_iam_member" "cloudbuild_gke_viewer" {
+  project = local.project_id
+  role    = "roles/container.clusterViewer"
+  member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
+
+# Grant permission to deploy workloads to GKE (needed for `kubectl apply`)
+resource "google_project_iam_member" "cloudbuild_gke_developer" {
+  project = local.project_id
+  role    = "roles/container.developer"
+  member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
+
+
 resource "google_cloudbuild_trigger" "github_push_trigger" {
   name     = "gke-nginx-demo-trigger"
   project  = local.project_id
