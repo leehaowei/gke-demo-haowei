@@ -14,6 +14,12 @@ resource "google_project_iam_member" "gke_metrics" {
   member  = "serviceAccount:${google_service_account.gke.email}"
 }
 
+resource "google_project_iam_member" "gke_artifact_registry_reader" {
+  project = local.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.gke.email}"
+}
+
 resource "google_container_node_pool" "general" {
   name     = "general"
   location = "us-central1-a"
