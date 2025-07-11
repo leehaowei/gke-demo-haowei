@@ -30,3 +30,22 @@
 ### Inspect the current version
 use the command below to check the current image version/tag
 `kubectl get deployment nginx -n demo -o yaml | grep image:`
+
+### GitOps with Cloud Build, Kustomize & Terraform
+This repository follows a GitOps approach by linking each Git branch to a Kubernetes environment (dev, staging, etc.), using Cloud Build triggers and Kustomize overlays.
+
+| Git Branch | Kustomize Overlay  | GKE Namespace | Triggered Pipeline        |
+| ---------- | ------------------ | ------------- | ------------------------- |
+| `main`     | `overlays/dev`     | `dev`         | `cloudbuild.yaml`         |
+| `staging`  | `overlays/staging` | `staging`     | `cloudbuild.staging.yaml` |
+
+Directory Structure
+```declarative
+base/                   # Base manifests shared across all environments
+overlays/
+  dev/                  # Kustomize overlay for dev environment
+  staging/              # Kustomize overlay for staging environment
+terraform/              # Infra as Code (Cloud Build, GKE, Artifact Registry, etc.)
+cloudbuild.yaml         # CI/CD pipeline for dev
+cloudbuild.staging.yaml # CI/CD pipeline for staging
+```
