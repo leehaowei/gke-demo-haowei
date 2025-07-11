@@ -2,11 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx-ingress
-  annotations:
-    kubernetes.io/ingress.class: "gce"  # for GKE's Ingress controller
 spec:
+  ingressClassName: gce
   rules:
-    - host: nginx.9young.xyz
+    - host: staging.nginx.9young.xyz
       http:
         paths:
           - path: /
