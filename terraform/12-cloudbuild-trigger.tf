@@ -20,6 +20,13 @@ resource "google_project_iam_member" "cloudbuild_editor" {
   member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
 }
 
+resource "google_project_iam_member" "cloudbuild_logging_writer" {
+  project = local.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
+
+
 # (Optional, but often needed if builds interact with Artifact Registry)
 resource "google_project_iam_member" "artifact_registry_writer" {
   project = local.project_id
