@@ -24,7 +24,7 @@ helm upgrade --install nginx ./helm/nginx \
   --set ingress.enabled=true \
   --set ingress.host=staging.nginx.9young.xyz \
   --set ingress.annotations."kubernetes\.io/ingress\.class"=gce \
-  --set ingress.annotations."networking\.gke\.io/security-policy=$POLICY_NAME" \
+  --set ingress.annotations."networking\.gke\.io/security-policy"="${POLICY_NAME}" \
   --set image.repository=us-central1-docker.pkg.dev/$1/${2}/${3} \
   --set image.tag=$4
 

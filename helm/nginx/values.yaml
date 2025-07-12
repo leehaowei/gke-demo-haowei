@@ -8,7 +8,7 @@ ingress:
   className: gce
   annotations:
     kubernetes.io/ingress.class: "gce"
-    networking.gke.io/security-policy: ""
+    networking.gke.io/security-policy: "nginx-cloud-armor-policy"
 
 service:
   name: nginx
