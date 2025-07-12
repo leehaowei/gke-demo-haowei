@@ -1,3 +1,4 @@
 .terraform/
 terraform/sa-key.json
 .idea
+terraform/cloudarmor.json

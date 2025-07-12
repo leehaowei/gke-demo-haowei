@@ -1,3 +1,10 @@
+### The Result
+- access to nginx server via `curl` or  browser `http://staging.nginx.9young.xyz`
+- to specific text file `http://staging.nginx.9young.xyz/sre.txt`
+
+### Future Improvement
+- separate the infra and app into two repos and `cloudbuild.yaml` to decouple
+
 ### Bootstrap up the GCP infra
 - `cd terraform`
 - `terraform plan`
