@@ -56,3 +56,6 @@ terraform/              # Infra as Code (Cloud Build, GKE, Artifact Registry, et
 cloudbuild.yaml         # CI/CD pipeline for dev
 cloudbuild.staging.yaml # CI/CD pipeline for staging
 ```
+
+### To list gcp resource
+`gcloud compute backend-services list --global`

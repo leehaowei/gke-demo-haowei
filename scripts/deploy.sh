@@ -33,3 +33,22 @@ helm upgrade --install nginx ./helm/nginx \
   --set image.tag=$4
 
 echo "✅ Deployment complete."
+
+echo "▶ Enforcing Cloud Armor policy on all GKE-created backend services"
+BACKENDS=$(gcloud compute backend-services list --global --format="value(name)" | grep k8s1-)
+
+for BACKEND in $BACKENDS; do
+  echo "🔍 Checking backend service: $BACKEND"
+  EXISTING_POLICY=$(gcloud compute backend-services describe "$BACKEND" --global --format="value(securityPolicy)")
+
+  if [[ "$EXISTING_POLICY" != "$POLICY_NAME" ]]; then
+    echo "🔗 Attaching Cloud Armor policy to $BACKEND"
+    gcloud compute backend-services update "$BACKEND" \
+      --global \
+      --security-policy="$POLICY_NAME"
+  else
+    echo "✅ $BACKEND already has the correct policy attached"
+  fi
+done
+
+echo "🎉 Cloud Armor policy enforcement complete."
