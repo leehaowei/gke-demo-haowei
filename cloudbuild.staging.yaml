@@ -1,80 +1,64 @@
-steps:
-  # Step 1: Build Docker image
-  - name: 'gcr.io/cloud-builders/docker:latest'
-    id: 'build-docker-image'
-    args:
-      - 'build'
-      - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}'
-      - '.'
+# Step 1: Build Docker image
+- name: 'gcr.io/cloud-builders/docker:latest'
+  id: 'build-docker-image'
+  args:
+    - 'build'
+    - '-t'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}'
+    - '.'
 
-  # Step 2: Push Docker image to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker:latest'
-    id: 'push-docker-image'
-    args:
-      - 'push'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}'
+# Step 2: Push Docker image to Artifact Registry
+- name: 'gcr.io/cloud-builders/docker:latest'
+  id: 'push-docker-image'
+  args:
+    - 'push'
+    - 'us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}'
 
-  # Step 3: Get GKE credentials (auth to cluster)
-  - name: 'gcr.io/cloud-builders/gcloud:latest'
-    id: 'get-gke-credentials'
-    args:
-      - 'container'
-      - 'clusters'
-      - 'get-credentials'
-      - '${_CLUSTER_NAME}'
-      - '--zone'
-      - '${_CLUSTER_ZONE}'
-      - '--project'
-      - '${PROJECT_ID}'
+# Step 3: Get GKE credentials (auth to cluster)
+- name: 'gcr.io/cloud-builders/gcloud:latest'
+  id: 'get-gke-credentials'
+  args:
+    - 'container'
+    - 'clusters'
+    - 'get-credentials'
+    - '${_CLUSTER_NAME}'
+    - '--zone'
+    - '${_CLUSTER_ZONE}'
+    - '--project'
+    - '${PROJECT_ID}'
 
-  # Step 4: Fetch cloudarmor.json from GCS and inject into Kustomize
-  - name: 'gcr.io/cloud-builders/kubectl'
-    id: 'apply-kustomize-manifests'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        set -euo pipefail
-        
-        echo "▶ Installing tools (kustomize & yq)"
-        curl -sLo kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.3.0/kustomize_v5.3.0_linux_amd64.tar.gz
-        tar -xzf kustomize.tar.gz
-        chmod +x kustomize
-        mv kustomize /usr/local/bin/kustomize
-        
-        curl -sLo /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64
-        chmod +x /usr/local/bin/yq
-        
-        echo "▶ Downloading cloudarmor.json"
-        gsutil cp gs://${PROJECT_ID}-infra-output/terraform/cloudarmor.json cloudarmor.json
-        
-        echo "▶ Extracting policy name"
-        POLICY_NAME=$(yq e '.cloudarmor_policy_name.value' cloudarmor.json)
-        
-        echo "▶ Injecting policy annotation into Ingress patch"
-        cd overlays/${_ENV}
-        # Escaped the dollar sign for the shell variable POLICY_NAME
-        yq e -i ".metadata.annotations.\"networking.gke.io/security-policy\" = \"\${POLICY_NAME}\"" ingress-patch.yaml
-        
-        echo "▶ Updating image in Kustomization"
-        kustomize edit set image ${_IMAGE_NAME}=us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}
-        
-        echo "▶ Applying manifests"
-        kubectl apply -k .
-        echo "✅ Deployment complete."
-
-# Cloud Build Options
-options:
-  pool:
-    name: 'projects/${PROJECT_ID}/locations/${_REGION}/workerPools/gke-deploy-private-pool'
-  logging: CLOUD_LOGGING_ONLY
-
-# Substitution variables
-substitutions:
-  _AR_REPO_NAME: gke-nginx-demo
-  _IMAGE_NAME: gke-nginx-demo
-  _CLUSTER_NAME: demo
-  _CLUSTER_ZONE: us-central1-a
-  _REGION: us-central1
-  _ENV: staging
+# Step 4: Fetch cloudarmor.json from GCS and inject into Kustomize
+- name: 'gcr.io/cloud-builders/kubectl'
+  id: 'apply-kustomize-manifests'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      set -euo pipefail
+      
+      echo "▶ Installing tools (kustomize & yq)"
+      curl -sLo kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.3.0/kustomize_v5.3.0_linux_amd64.tar.gz
+      tar -xzf kustomize.tar.gz
+      chmod +x kustomize
+      mv kustomize /usr/local/bin/kustomize
+      
+      curl -sLo /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64
+      chmod +x /usr/local/bin/yq
+      
+      echo "▶ Downloading cloudarmor.json"
+      gsutil cp gs://${PROJECT_ID}-infra-output/terraform/cloudarmor.json cloudarmor.json
+      
+      echo "▶ Extracting policy name"
+      POLICY_NAME=$(yq e '.cloudarmor_policy_name.value' cloudarmor.json)
+      
+      echo "▶ Injecting policy annotation into Ingress patch"
+      cd overlays/${_ENV}
+      # Escaped the dollar sign for the shell variable POLICY_NAME
+      yq e -i ".metadata.annotations.\"networking.gke.io/security-policy\" = \"\${POLICY_NAME}\"" ingress-patch.yaml
+      
+      echo "▶ Updating image in Kustomization"
+      kustomize edit set image ${_IMAGE_NAME}=us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}
+      
+      echo "▶ Applying manifests"
+      kubectl apply -k .
+      echo "✅ Deployment complete."
