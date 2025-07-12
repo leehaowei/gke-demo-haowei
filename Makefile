@@ -7,7 +7,7 @@ DOCKERFILE_PATH := Dockerfile
 LOCAL_PORT      := 8080
 CONTAINER_NAME  := gke-nginx-demo
 
-.PHONY: all build run push clean stop
+.PHONY: all build run push clean stop destroy
 
 all: build run
 
@@ -30,3 +30,12 @@ push:
 ## Remove the built image
 clean:
 	docker rmi $(FULL_IMAGE_NAME)
+
+## Destroy all Kubernetes + Terraform resources
+destroy:
+	@echo "🧹 Uninstalling Helm release 'nginx'..."
+	-helm uninstall nginx || true
+
+	@echo "🧨 Running Terraform destroy..."
+	terraform destroy -auto-approve
+
