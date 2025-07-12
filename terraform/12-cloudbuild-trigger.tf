@@ -117,3 +117,17 @@ resource "google_storage_bucket_iam_member" "cloudbuild_sa_gcs_reader" {
   role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
 }
+
+# Grant Cloud Build SA permission to manage backend services and attach Cloud Armor
+resource "google_project_iam_member" "cloudbuild_compute_security_admin" {
+  project = local.project_id
+  role    = "roles/compute.securityAdmin"
+  member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
+
+# Grant Cloud Build SA full load balancer admin rights (safe for backend service policy updates)
+resource "google_project_iam_member" "cloudbuild_lb_admin" {
+  project = local.project_id
+  role    = "roles/compute.loadBalancerAdmin"
+  member  = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
