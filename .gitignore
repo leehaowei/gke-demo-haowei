@@ -2,3 +2,5 @@
 terraform/sa-key.json
 .idea
 terraform/cloudarmor.json
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup

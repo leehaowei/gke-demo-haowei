@@ -59,3 +59,6 @@ cloudbuild.staging.yaml # CI/CD pipeline for staging
 
 ### To list gcp resource
 `gcloud compute backend-services list --global`
+
+### Check IP country
+`curl ipinfo.io`
