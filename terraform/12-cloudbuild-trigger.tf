@@ -110,3 +110,10 @@ resource "google_cloudbuild_trigger" "staging_trigger" {
   included_files = ["**"]
   ignored_files  = ["README.md"]
 }
+
+# Grant Cloud Build SA permission to read from GCS (for cloudarmor.json)
+resource "google_storage_bucket_iam_member" "cloudbuild_sa_gcs_reader" {
+  bucket = google_storage_bucket.infra_outputs.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.cloudbuild_sa.email}"
+}
