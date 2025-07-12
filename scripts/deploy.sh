@@ -13,6 +13,10 @@ gsutil cp gs://$1-infra-output/terraform/cloudarmor.json cloudarmor.json
 
 echo "▶ Extracting Cloud Armor policy name"
 POLICY_NAME=$(yq e '.cloudarmor_policy_name.value' cloudarmor.json)
+
+# Strip double quotes from POLICY_NAME ---
+POLICY_NAME="${POLICY_NAME//\"/}"
+
 if [ -z "$POLICY_NAME" ]; then
   echo "Error: Failed to extract POLICY_NAME from cloudarmor.json"
   exit 1
