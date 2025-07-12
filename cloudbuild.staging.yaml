@@ -79,3 +79,4 @@ substitutions:
   _CLUSTER_ZONE: us-central1-a
   _REGION: us-central1
   _ENV: staging
+  _POLICY_NAME: nginx-cloud-armor-policy
