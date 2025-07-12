@@ -1,0 +1,6 @@
+ingress:
+  enabled: true
+  host: staging.nginx.9young.xyz
+  annotations:
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/security-policy: ""
