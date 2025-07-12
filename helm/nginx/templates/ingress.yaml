@@ -4,9 +4,9 @@ kind: Ingress
 metadata:
   name: nginx-ingress
   annotations:
-  {{- range $key, $val := .Values.ingress.annotations }}
-  {{ $key }}: "{{ $val }}"
-  {{- end }}
+    {{- with .Values.ingress.annotations }}
+      {{- toYaml . | nindent 4 }}
+      {{- end }}
 spec:
   ingressClassName: gce
   rules:
