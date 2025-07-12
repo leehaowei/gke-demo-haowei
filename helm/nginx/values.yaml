@@ -1,6 +1,16 @@
+image:
+  repository: us-central1-docker.pkg.dev/YOUR_PROJECT_ID/gke-nginx-demo/gke-nginx-demo
+  tag: latest
+
 ingress:
   enabled: true
   host: staging.nginx.9young.xyz
+  className: gce
   annotations:
     kubernetes.io/ingress.class: "gce"
     networking.gke.io/security-policy: ""
+
+service:
+  name: nginx
+  type: ClusterIP
+  port: 80
