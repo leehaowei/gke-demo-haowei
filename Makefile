@@ -37,5 +37,5 @@ destroy:
 	-helm uninstall nginx || true
 
 	@echo "🧨 Running Terraform destroy..."
-	terraform destroy -auto-approve
+	cd terraform && terraform destroy
 
