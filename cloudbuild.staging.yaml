@@ -1,5 +1,3 @@
-# Cloud Build CI/CD Pipeline with dynamic Cloud Armor policy for Helm
-
 steps:
   # Step 1: Build Docker image
   - name: 'gcr.io/cloud-builders/docker:latest'
@@ -30,38 +28,16 @@ steps:
       - '--project'
       - '${PROJECT_ID}'
 
-  # Step 4: Install tools and deploy with Helm using dynamic policy
+  # Step 4: Deploy with Helm using deploy.sh
   - name: 'gcr.io/cloud-builders/kubectl'
     id: 'deploy-with-helm'
     entrypoint: 'bash'
     args:
-      - '-c'
-      - |
-        set -euo pipefail
-
-        echo "▶ Installing yq and Helm"
-        curl -sLo /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.43.1/yq_linux_amd64
-        chmod +x /usr/local/bin/yq
-        curl -sLo helm.tar.gz https://get.helm.sh/helm-v3.14.2-linux-amd64.tar.gz
-        tar -xzf helm.tar.gz
-        mv linux-amd64/helm /usr/local/bin/helm
-
-        echo "▶ Downloading cloudarmor.json"
-        gsutil cp gs://${PROJECT_ID}-infra-output/terraform/cloudarmor.json cloudarmor.json
-
-        echo "▶ Extracting policy name"
-        POLICY_NAME=$(yq e '.cloudarmor_policy_name.value' cloudarmor.json)
-
-        echo "▶ Deploying via Helm with policy: $POLICY_NAME"
-        helm upgrade --install nginx ./helm/nginx \
-          --set ingress.enabled=true \
-          --set ingress.host=staging.nginx.9young.xyz \
-          --set ingress.annotations."kubernetes\.io/ingress\.class"=gce \
-          --set ingress.annotations."networking\.gke\.io/security-policy"=$POLICY_NAME \
-          --set image.repository=us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME} \
-          --set image.tag=${COMMIT_SHA}
-
-        echo "✅ Deployment complete."
+      - 'scripts/deploy.sh'
+      - '${PROJECT_ID}'
+      - '${_AR_REPO_NAME}'
+      - '${_IMAGE_NAME}'
+      - '${COMMIT_SHA}'
 
 options:
   pool:
