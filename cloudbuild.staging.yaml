@@ -1,5 +1,3 @@
-# Cloud Build CI/CD Pipeline to build, push, and deploy to GKE using Kustomize and dynamic Cloud Armor policy
-
 steps:
   # Step 1: Build Docker image
   - name: 'gcr.io/cloud-builders/docker:latest'
@@ -56,7 +54,8 @@ steps:
         
         echo "▶ Injecting policy annotation into Ingress patch"
         cd overlays/${_ENV}
-        yq e -i ".metadata.annotations.\"networking.gke.io/security-policy\" = \"${POLICY_NAME}\"" ingress-patch.yaml
+        # Escaped the dollar sign for the shell variable POLICY_NAME
+        yq e -i ".metadata.annotations.\"networking.gke.io/security-policy\" = \"\${POLICY_NAME}\"" ingress-patch.yaml
         
         echo "▶ Updating image in Kustomization"
         kustomize edit set image ${_IMAGE_NAME}=us-central1-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO_NAME}/${_IMAGE_NAME}:${COMMIT_SHA}
@@ -79,4 +78,3 @@ substitutions:
   _CLUSTER_ZONE: us-central1-a
   _REGION: us-central1
   _ENV: staging
-  _POLICY_NAME: nginx-cloud-armor-policy
