@@ -48,3 +48,31 @@ resource "google_container_node_pool" "general" {
     ]
   }
 }
+
+# grant permissions to create Google Cloud Load Balancer resources
+resource "google_project_iam_member" "gke_load_balancer_admin" {
+  project = local.project_id
+  role    = "roles/compute.loadBalancerAdmin"
+  member  = "serviceAccount:${google_service_account.gke.email}"
+}
+
+resource "google_project_iam_member" "gke_network_admin" {
+  project = local.project_id
+  role    = "roles/compute.networkAdmin"
+  member  = "serviceAccount:${google_service_account.gke.email}"
+}
+
+# Optional but often helpful if the controller creates firewall rules
+resource "google_project_iam_member" "gke_security_admin" {
+  project = local.project_id
+  role    = "roles/compute.securityAdmin"
+  member  = "serviceAccount:${google_service_account.gke.email}"
+}
+
+# Add this role, it's often needed for the GKE control plane to manage cluster resources.
+# Although less directly for LB, it's a good general GKE SA permission.
+resource "google_project_iam_member" "gke_container_admin" {
+  project = local.project_id
+  role    = "roles/container.admin"
+  member  = "serviceAccount:${google_service_account.gke.email}"
+}

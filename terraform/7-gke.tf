@@ -11,7 +11,7 @@ resource "google_container_cluster" "gke" {
 
   addons_config {
     http_load_balancing {
-      disabled = true
+      disabled = false # enable for ingress controller for external traffic, mind the cost $$$
     }
     horizontal_pod_autoscaling {
       disabled = false
