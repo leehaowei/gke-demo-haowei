@@ -53,4 +53,4 @@ done
 set -e  # Re-enable strict error checking for other parts
 
 echo "🎉 Cloud Armor policy enforcement complete."
-exit 0  # <–– Make sure script exits cleanly
+exit 0
