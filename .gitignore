@@ -4,3 +4,4 @@ terraform/sa-key.json
 terraform/cloudarmor.json
 terraform/terraform.tfstate
 terraform/terraform.tfstate.backup
+terraform/.terraform.tfstate.lock.info
