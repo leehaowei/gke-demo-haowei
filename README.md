@@ -34,6 +34,7 @@ Key features:
 ## ✅ Testing & Verification
 
 Test the deployment using a real domain:
+- * The URL below no longer works as the NS has been changed
 - **URL**: [`staging.nginx.9young.xyz/sre.txt`](http://staging.nginx.9young.xyz/sre.txt)
 - **Behavior**:
   - ✅ **From Taiwan**: Returns `200 OK` with `Hello SRE!`
